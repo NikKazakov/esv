@@ -15,5 +15,6 @@ int main(int argc, char *argv[])
 {
     if (argc != 2) exit(1);
     foo(argv[1]);
+    printf("returned to main, exiting...");
     return 0;
 }
