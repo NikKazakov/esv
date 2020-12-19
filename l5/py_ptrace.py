@@ -1,8 +1,8 @@
 import ctypes
 # look file /usr/ include / x86_64 -linux -gnu /sys/ user .h
 # struct pt_regs
-class user_regs_struct ( ctypes.Structure ):
-_fields_ = map( lambda x : (x, ctypes.c_ulong),
+class user_regs_struct(ctypes.Structure):
+    _fields_ = map(lambda x : (x, ctypes.c_ulong),
 				['r15', 'r14', 'r13', 'r12', 'rbp',
 				 'rbx', 'r11', 'r10', 'r9', 'r8',
 				 'rax', 'rcx', 'rdx', 'rsi', 'rdi',
@@ -32,15 +32,15 @@ import os
 import signal
 import copy
 
-def alloc_pages (pid, npages=1, data=None):
-	libc.ptrace (PTRACE_ATTACH, pid, None, None)
-	status = os.waitpid (pid , 0)
-	if os.WIFSTOPPED(status [1]) and os.WSTOPSIG(status[1]) == signal.SIGSTOP:
+def alloc_pages(pid, npages=1, data=None):
+	libc.ptrace(PTRACE_ATTACH, pid, None, None)
+	status = os.waitpid(pid, 0)
+	if os.WIFSTOPPED(status[1]) and os.WSTOPSIG(status[1]) == signal.SIGSTOP:
 		print 'attached '
 	else:
 		print 'not attached'
 		sys.exit(1)
-	
+
 	# save registers
 	old_regs = user_regs_struct()
 	libc.ptrace(PTRACE_GETREGS, pid, None, ctypes.byref(old_regs))
@@ -77,9 +77,9 @@ def alloc_pages (pid, npages=1, data=None):
 
 	if data is not None and data != '':
 	# write in 8 - byte chunks in reverse order
-		l = ['{:02 x}'.format(ord(d)) for d in data] + ['00 ']
-	for i in range(( len(l) - 1)/8 + 1):
-		a = reversed(l[i*8:(i+1)*8])
+		l = ['{:02x}'.format(ord(d)) for d in data] + ['00']
+	for i in range((len(l) - 1) / 8 + 1):
+		a = reversed(l[i * 8:(i + 1) * 8])
 		libc.ptrace(PTRACE_POKEDATA, pid, ctypes.c_void_p(addr+i*8), int(''.join(a),16))
 
 	# restore registers and next instruction
